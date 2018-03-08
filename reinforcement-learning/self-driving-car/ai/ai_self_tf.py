@@ -5,7 +5,6 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 import collections
 import os
-from tensorflow.python import debug as tf_debug
 
 HIDDEN_LAYER_SIZE = 30
 
