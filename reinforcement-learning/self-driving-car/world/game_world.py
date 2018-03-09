@@ -1,6 +1,6 @@
-import numpy as np
 import collections
 
+import numpy as np
 from kivy.vector import Vector
 
 Point = collections.namedtuple("Point", "x y")
@@ -31,3 +31,4 @@ class SelfDrivingCarGameWorld:
 
     def reset_sand(self):
         self.sand = np.zeros((self.width, self.height))
+        self.sand_lines = []

@@ -21,7 +21,7 @@ class MyPaintWidget(Widget):
             last_y = int(touch.y)
             n_points = 0
             length = 0
-            if touch.x < len(self.width) and touch.y < len(self.height):
+            if touch.x < self.width and touch.y < self.height:
                 self.game_world.sand[int(touch.x), int(touch.y)] = 1
 
     def on_touch_move(self, touch):

@@ -1,11 +1,10 @@
-import numpy as np
-import random
 import os
+import random
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import torch.autograd as autograd
 from torch.autograd import Variable
 
 HIDDEN_LAYER_SIZE = 30
@@ -95,13 +94,13 @@ class Dqn():
     def score(self):
         return sum(self.reward_window) / len(self.reward_window) + 1.
 
-    def save(self):
-        torch.save({'state_dict': self.model.state_dict(), 'optimizer': self.optimizer.state_dict()}, "last_brain.pth")
+    def save(self, filename):
+        torch.save({'state_dict': self.model.state_dict(), 'optimizer': self.optimizer.state_dict()}, filename)
 
-    def load(self):
-        if os.path.exists("last_brain.pth"):
+    def load(self, filename):
+        if os.path.exists(filename):
             print("===>> Loading checkpoint ...")
-            checkpoint = torch.load("last_brain.pth")
+            checkpoint = torch.load(filename)
             self.model.load_state_dict(checkpoint["state_dict"])
             self.optimizer.load_state_dict(checkpoint["optimizer"])
         else:

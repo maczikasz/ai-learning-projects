@@ -1,5 +1,6 @@
-from ai_input_provider import AiInputProvider
 from abc import ABCMeta, abstractmethod
+
+from ai_input_provider import AiInputProvider
 
 
 class SelfDrivingCarAI:
@@ -9,6 +10,9 @@ class SelfDrivingCarAI:
     def get_next_action(self, input, last_reward):
         action = self.brain.update(last_reward, input)
         return AiActionProvider.ACTIONS[action]
+
+    def score(self):
+        return self.brain.score()
 
 
 class AiAction:

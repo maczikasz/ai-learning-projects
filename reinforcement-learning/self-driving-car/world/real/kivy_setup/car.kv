@@ -1,0 +1,108 @@
+#:kivy 1.0.9
+# ref: https://kivy.org/docs/tutorials/pong.html
+
+<Car>:
+    size: 20, 10
+    canvas:
+        PushMatrix
+        Rotate:
+            angle: self.angle
+            origin: self.center
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        PopMatrix
+
+<Ball1>:
+    size: 10,10
+    canvas:
+        Color:
+            rgba: 1,0,0,1
+        Ellipse:
+            pos: self.pos
+            size: self.size
+<Ball2>:
+    size: 10,10
+    canvas:
+        Color:
+            rgba: 0,1,1,1
+        Ellipse:
+            pos: self.pos
+            size: self.size
+
+<Ball3>:
+    size: 10,10
+    canvas:
+        Color:
+            rgba: 1,1,0,1
+        Ellipse:
+            pos: self.pos
+            size: self.size
+
+<Game>:
+    car: game_car
+    ball1: game_ball1
+    ball2: game_ball2
+    ball3: game_ball3
+
+    Car:
+        id: game_car
+        center: self.parent.center
+    Ball1:
+        id: game_ball1
+        center: self.parent.center
+    Ball2:
+        id: game_ball2
+        center: self.parent.center
+    Ball3:
+        id: game_ball3
+        center: self.parent.center
+
+
+<LoadDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            rootpath: root.rootpath
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Load"
+                on_release: root.load(filechooser.path, filechooser.selection[0])
+
+<SaveDialog>:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            rootpath: root.rootpath
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release: root.save(filechooser.path, text_input.text)

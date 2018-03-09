@@ -1,10 +1,11 @@
-import numpy as np
-import random
-import shutil
-import tensorflow as tf
-import tensorflow.contrib.slim as slim
 import collections
 import os
+import random
+import shutil
+
+import numpy as np
+import tensorflow as tf
+import tensorflow.contrib.slim as slim
 
 HIDDEN_LAYER_SIZE = 30
 
@@ -126,12 +127,12 @@ class Dqn():
     def score(self):
         return sum(self.reward_window) / len(self.reward_window) + 1.
 
-    def save(self):
-        self.saver.save(self.sess, "./last_brain_tf.tf")
+    def save(self, filename):
+        self.saver.save(self.sess, filename)
 
-    def load(self):
-        if os.path.exists("last_brain_tf.tf"):
+    def load(self, filename):
+        if os.path.exists(filename):
             print("===>> Loading checkpoint ...")
-            self.saver.restore(self.sess, "./last_brain_tf.tf")
+            self.saver.restore(self.sess, filename)
         else:
             print("Nothing to load")
