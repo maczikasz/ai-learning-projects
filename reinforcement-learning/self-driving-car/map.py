@@ -64,6 +64,7 @@ score_history = ScoreHistory()
 save_orchestrator = SaveOrchestrator("saves/", ai.brain, game_world)
 game_updater = GameUpdater(reward_calculator, ai_input_provider, ai, score_history, game_world)
 sand_painter = MyPaintWidget(HEIGHT, WIDTH, game_world)
+game_simulator = GameSimulator(game_updater)
 
 if args.sand:
     save_orchestrator.load_sand(os.path.join(SAVES_SANDS, args.sand))
@@ -85,7 +86,7 @@ if args.mode == SIMULATION:
     print "Finished %i iterations brain saved to %s" % (args.iterations, args.end_brain)
 elif args.mode == UI:
     Builder.load_file("world/real/kivy_setup/car.kv")
-    game = Game(game_updater)
+    game = Game(game_updater, game_simulator)
     CarApp(game_world, save_orchestrator, score_history, game, sand_painter, SAVES_SANDS, SAVES_BRAINS).run()
 else:
     raise AssertionError("Must be either ui or simulation")

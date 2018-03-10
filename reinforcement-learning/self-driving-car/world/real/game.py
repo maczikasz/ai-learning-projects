@@ -10,8 +10,9 @@ class Game(Widget):
     ball2 = ObjectProperty(None)
     ball3 = ObjectProperty(None)
 
-    def __init__(self, gameUpdater, **kwargs):
+    def __init__(self, gameUpdater, game_simulator, **kwargs):
         super(Game, self).__init__(**kwargs)
+        self.game_simulator = game_simulator
         self.game_updater = gameUpdater
         self.last_reward = 0
 
@@ -25,5 +26,5 @@ class Game(Widget):
         self.ball3.pos = self.car.sensor3
 
     def update(self, dt):
-        self.game_updater.update(self.car)
+        self.game_updater.update_and_compare(self.car, self.game_simulator.car)
         self.update_ui_element_positions()
