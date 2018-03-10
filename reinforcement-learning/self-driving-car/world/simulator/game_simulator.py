@@ -7,7 +7,7 @@ Point = collections.namedtuple("Point", "x y")
 
 class GameSimulator:
     def __init__(self, game_updater):
-        self.car = SimulatedCar(np.array([200, 200]), np.array([6, 0]))
+        self.car = SimulatedCar(np.array([390, 295]), np.array([6, 0]))
         self.game_updater = game_updater
 
     def update(self, dt):
@@ -47,9 +47,9 @@ class SimulatedCar:
         self._set_pos(self.velocity + self.pos)
         self.rotation = rotation
         self.angle = self.angle + self.rotation
-        self.sensor1 = _to_point(np.array([30, 0]).dot(_rotate(self.angle)) + self.pos)
-        self.sensor2 = _to_point(np.array([30, 0]).dot(_rotate((self.angle + 30) % 360)) + self.pos)
-        self.sensor3 = _to_point(np.array([30, 0]).dot(_rotate((self.angle - 30) % 360)) + self.pos)
+        self.sensor1 = _to_point(np.matmul(_rotate(self.angle), np.array([30, 0])) + self.pos)
+        self.sensor2 = _to_point(np.matmul(_rotate((self.angle + 30) % 360), np.array([30, 0])) + self.pos)
+        self.sensor3 = _to_point(np.matmul(_rotate((self.angle - 30) % 360), np.array([30, 0])) + self.pos)
 
         self.signal1 = int(np.sum(game_world.sand[int(self.sensor1.x) - 10:int(self.sensor1.x) + 10,
                                   int(self.sensor1.y) - 10:int(self.sensor1.y) + 10])) / 400.
