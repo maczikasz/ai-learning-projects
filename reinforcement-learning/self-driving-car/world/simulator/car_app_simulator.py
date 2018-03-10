@@ -9,5 +9,8 @@ class CarAppSimulator:
     def run(self):
         step = 0
         while self.run_condition(step):
+            if step % 1000 == 0:
+                print step
+
             step += 1
             self.game_simulator.update(step)

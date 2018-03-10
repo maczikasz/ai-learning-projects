@@ -17,7 +17,7 @@ class SaveOrchestrator:
             pickle.dump({'lines': self.game_world.sand_lines, 'sand': self.game_world.sand}, filehandle)
 
     def load_brain(self, filename):
-        self.brain.save(filename)
+        self.brain.load(filename)
 
     def load_sand(self, filename):
         with open(filename, 'r') as filehandle:

@@ -44,6 +44,18 @@ class Car(Widget):
         if self.sensor3_x > game_world.width - 10 or self.sensor3_x < 10 or self.sensor3_y > game_world.height - 10 or self.sensor3_y < 10:
             self.signal3 = 1.
 
+        self.reposition(game_world)
+
+    def reposition(self, game_world):
+        if self.x < 10:
+            self.x = 10
+        if self.y < 10:
+            self.y = 10
+        if self.x > game_world.width - 10:
+            self.x = game_world.width - 10
+        if self.y > game_world.height - 10:
+            self.y = game_world.height - 10
+
 
 class Ball1(Widget):
     pass

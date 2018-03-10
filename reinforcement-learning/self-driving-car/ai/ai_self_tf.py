@@ -98,7 +98,6 @@ class Dqn():
                 self.input_tensor: states,
                 self.action: actions,
                 self.target: target})
-        print loss
         self.train_writer.add_summary(summary)
 
     def update(self, reward, new_signal):
@@ -107,11 +106,11 @@ class Dqn():
 
         q_orig, softmax, action_value = self.sess.run([self.q, self.softmax, self.chosen_action],
                                                       feed_dict={self.input_tensor: [new_signal]})
-        print "Qvalues"
-        print q_orig
+        # print "Qvalues"
+        # print q_orig
         # print "Qvalues after softmax"
         # print softmax
-        print reward
+        # print reward
         action = action_value[0]
 
         if len(self.memory.memory) > 300:

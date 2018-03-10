@@ -46,6 +46,7 @@ class CarApp(App):
         parent.add_widget(savesandbtn)
         parent.add_widget(loadsandbtn)
         parent.add_widget(graphbutton)
+        self.painter.redraw_sand()
         return parent
 
     def clear_canvas(self, obj):

@@ -63,3 +63,19 @@ class SimulatedCar:
             self.signal2 = 1.
         if self.sensor3.x > game_world.width - 10 or self.sensor3.x < 10 or self.sensor3.y > game_world.height - 10 or self.sensor3.y < 10:
             self.signal3 = 1.
+
+        self.reposition(game_world)
+
+    def reposition(self, game_world):
+        x = self.x
+        y = self.y
+        if x < 10:
+            x = 10
+        if y < 10:
+            y = 10
+        if x > game_world.width - 10:
+            x = game_world.width - 10
+        if y > game_world.height - 10:
+            y = game_world.height - 10
+
+        self._set_pos(Point(x, y))
