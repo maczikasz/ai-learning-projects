@@ -23,11 +23,6 @@ class AiAction:
         pass
 
 
-class NoOpAction(AiAction):
-    def apply(self, car, game_world):
-        pass
-
-
 class RotationAction(AiAction):
     def __init__(self, deg):
         self.deg = deg
@@ -37,5 +32,5 @@ class RotationAction(AiAction):
 
 
 class AiActionProvider:
-    ACTIONS = [NoOpAction(), RotationAction(-20), RotationAction(-10), RotationAction(10), RotationAction(20)]
+    ACTIONS = [RotationAction(0), RotationAction(-20), RotationAction(-10), RotationAction(10), RotationAction(20)]
     NUMBER_OF_ACTIONS = len(ACTIONS)
