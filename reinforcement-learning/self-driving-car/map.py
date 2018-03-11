@@ -8,8 +8,9 @@ import os
 from kivy import Config
 from kivy.lang import Builder
 
-from ai.ai_self import Dqn
-# from ai.ai_self_tf import Dqn
+# from ai.ai_self_keras import Dqn
+from ai.ai_self_tf import Dqn
+# from ai.ai_self import Dqn
 from infra.save_orchestrator import SaveOrchestrator
 from infra.score_history import ScoreHistory
 from world.ai import SelfDrivingCarAI
