@@ -2,7 +2,7 @@ from kivy.vector import Vector
 
 
 class AiInputProvider:
-    INPUT_DIM = 7
+    INPUT_DIM = 5
 
     def __init__(self, game_world):
         self.game_world = game_world
@@ -13,4 +13,4 @@ class AiInputProvider:
         xx = self.game_world.get_goal().x - x
         yy = self.game_world.get_goal().y - y
         orientation = Vector(*car.velocity).angle((xx, yy)) / 180.
-        return [car.signal1, car.signal2, car.signal3, orientation, -orientation, x, y]
+        return [car.signal1, car.signal2, car.signal3, orientation, -orientation]
