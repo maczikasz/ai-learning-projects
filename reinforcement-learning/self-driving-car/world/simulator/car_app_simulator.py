@@ -11,6 +11,8 @@ class CarAppSimulator:
         while self.run_condition(step):
             if step % 1000 == 0:
                 print step
+            if step % 10000 == 0:
+                self.score_history.plot_rewards()
 
             step += 1
             self.game_simulator.update(step)
