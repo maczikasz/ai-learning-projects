@@ -8,9 +8,6 @@ import os
 from kivy import Config
 from kivy.lang import Builder
 
-# from ai.ai_self_keras import Dqn
-from ai.ai_self_tf import Dqn
-# from ai.ai_self import Dqn
 from infra.save_orchestrator import SaveOrchestrator
 from infra.score_history import ScoreHistory
 from world.ai import SelfDrivingCarAI
@@ -27,14 +24,27 @@ from world.simulator.game_simulator import GameSimulator
 UI = "ui"
 SIMULATION = "simulation"
 
+TF, PYTORCH, KERAS, TF_DOUBLE = ("tf", "pytorch", "keras", "tf_double")
+
 parser = argparse.ArgumentParser(description='Run self driving car AI.')
 parser.add_argument('--mode', help='Run in simulation mode', choices=[SIMULATION, UI])
+parser.add_argument('--impl', help='Select implementation to run', choices=[TF, PYTORCH, KERAS, TF_DOUBLE])
 parser.add_argument('--start_brain', help='Name of brain to start with, from saves/brains')
 parser.add_argument('--end_brain', help='Name of brain to write to after the iterations are done, from saves/brains')
 parser.add_argument('--sand', help='Name of sand file to load from saves/sands')
 parser.add_argument('--iterations', type=int, help='How many iterations to run in simulation mode')
+parser.add_argument('--save_after_steps', type=int, help='How many iterations to run in simulation mode')
 
 args = parser.parse_args()
+
+if args.impl == TF:
+    from ai.tf.ai_self_tf import Dqn
+elif args.impl == TF_DOUBLE:
+    from ai.tf.ai_self_tf_dualq import Dqn
+elif args.impl == KERAS:
+    from ai.ai_self_keras import Dqn
+elif args.impl == PYTORCH:
+    from ai.ai_self import Dqn
 
 # Adding this line if we don't want the right click to put a red point
 SAVES = "./saves"
@@ -73,12 +83,28 @@ if args.start_brain:
     save_orchestrator.load_brain(os.path.join(SAVES_BRAINS, args.start_brain))
 
 if args.mode == SIMULATION:
-    if not args.iterations:
-        raise AssertionError("Iterations must be defined for simulation")
+    if not args.iterations and not args.save_after_steps:
+        raise AssertionError("Iterations or save_after_steps must be defined for simulation")
 
     game_simulator = GameSimulator(game_updater)
+    if args.iterations:
+        def condition(step):
+            return step < args.iterations
+    else:
+        def condition(step):
+            return True
+
+    if args.save_after_steps:
+        def after_each_step(step):
+            if step % args.save_after_steps == 0 and step != 0:
+                print "Saving brain"
+                save_orchestrator.save_brain(os.path.join(SAVES_BRAINS, args.end_brain))
+    else:
+        def after_each_step(step):
+            pass
+
     car_app_simulator = CarAppSimulator(game_world, save_orchestrator, score_history, game_simulator,
-                                        lambda step: step < args.iterations)
+                                        condition, after_each_step)
     car_app_simulator.run()
     if args.end_brain:
         save_orchestrator.save_brain(os.path.join(SAVES_BRAINS, args.end_brain))
