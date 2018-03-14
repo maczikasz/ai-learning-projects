@@ -14,6 +14,26 @@ class GameSimulator:
         self.game_updater.update(self.car)
 
 
+class GameSimulatorEnv:
+    def __init__(self, game_updater, counter):
+        self.counter = counter
+        self.car = SimulatedCar(np.array([390, 295]), np.array([6, 0]))
+        self.game_updater = game_updater
+
+    def reset(self):
+        self.car = SimulatedCar(np.array([390, 295]), np.array([6, 0]))
+
+    def get_state(self):
+        return self.game_updater.get_state(self.car)
+
+    def take_action(self, ai_action):
+        self.game_updater.take_action(self.car, ai_action)
+        return self.game_updater.get_reward(self.car)
+
+    def is_done(self):
+        return self.counter.counter >= 2
+
+
 def _rotate(deg):
     theta = np.radians(deg)
     c, s = np.cos(theta), np.sin(theta)

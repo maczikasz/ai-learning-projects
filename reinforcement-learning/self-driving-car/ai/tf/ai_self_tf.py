@@ -71,7 +71,7 @@ class Dqn():
         self.saver = tf.train.Saver()
         self.sess.run(init)
 
-    def _learn(self, transitions):
+    def learn(self, transitions):
         states = np.array(map(lambda transition: transition.state, transitions))
 
         next_stateQs = self.sess.run(self.q, feed_dict={
@@ -93,19 +93,25 @@ class Dqn():
     def update(self, reward, new_signal):
         self.memory.push(
             Transition(state=self.last_state, action=self.last_action, reward=reward, next_state=new_signal))
-
-        q_orig, softmax, action_value = self.sess.run([self.q, self.softmax, self.chosen_action],
-                                                      feed_dict={self.input_tensor: [new_signal]})
-        action = action_value[0]
+        action = self.get_action(new_signal)
 
         if len(self.memory.memory) > 300:
             transitions = self.memory.sample(100)
-            self._learn(transitions)
+            self.learn(transitions)
 
         self.last_action = action
         self.last_state = new_signal
+        self.append_reward(reward)
+
+        return action
+
+    def append_reward(self, reward):
         self.reward_window.append(reward)
 
+    def get_action(self, new_signal):
+        q_orig, softmax, action_value = self.sess.run([self.q, self.softmax, self.chosen_action],
+                                                      feed_dict={self.input_tensor: [new_signal]})
+        action = action_value[0]
         return action
 
     def score(self):

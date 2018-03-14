@@ -6,8 +6,14 @@ from kivy.vector import Vector
 Point = collections.namedtuple("Point", "x y")
 
 
+def print_goal(goal):
+    print goal
+
+
 class SelfDrivingCarGameWorld:
-    def __init__(self, width, height):
+
+    def __init__(self, width, height, goal_change_listener=print_goal):
+        self.goal_change_listener = goal_change_listener
         self.sand = np.zeros((width, height))
         self.sand_lines = []
         self.width = width
@@ -25,7 +31,7 @@ class SelfDrivingCarGameWorld:
 
         if distance < 100:
             self.goal = Point(self.width - self.goal.x, self.height - self.goal.y)
-            print self.goal
+            self.goal_change_listener(self.goal)
 
     def get_goal(self):
         return self.goal

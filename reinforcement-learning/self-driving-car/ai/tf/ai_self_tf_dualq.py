@@ -113,7 +113,7 @@ class Dqn:
         self.target = QNet(input_size, nb_action, "target")
         self.steps_since_last_update = 0
 
-    def _learn(self, transitions):
+    def learn(self, transitions):
         states = np.array(map(lambda transition: transition.state, transitions))
 
         next_state_qs = self.target.predict_q_values(
@@ -137,14 +137,20 @@ class Dqn:
 
         if len(self.memory.memory) > 500:
             transitions = self.memory.sample(300)
-            self._learn(transitions)
+            self.learn(transitions)
 
-        action = self.online.select_action(new_signal)
+        action = self.select_action(new_signal)
         self.last_action = action
         self.last_state = new_signal
-        self.reward_window.append(reward)
+        self.append_reward(reward)
 
         return action
+
+    def append_reward(self, reward):
+        self.reward_window.append(reward)
+
+    def select_action(self, new_signal):
+        return self.online.select_action(new_signal)
 
     def score(self):
         return sum(self.reward_window) / len(self.reward_window) + 1.
