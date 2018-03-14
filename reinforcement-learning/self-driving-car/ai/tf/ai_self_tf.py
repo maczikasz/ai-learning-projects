@@ -1,6 +1,4 @@
-import collections
 import os
-import random
 import shutil
 
 import numpy as np
@@ -8,22 +6,6 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 
 HIDDEN_LAYER_SIZE = 30
-
-Transition = collections.namedtuple("Transition", "state action reward next_state")
-
-
-class ReplayMemory:
-    def __init__(self, capacity):
-        self.capacity = capacity
-        self.memory = []
-
-    def push(self, event):
-        self.memory.append(event)
-        if len(self.memory) > self.capacity:
-            del self.memory[0]
-
-    def sample(self, batch_size):
-        return random.sample(self.memory, batch_size)
 
 
 class Dqn():
@@ -34,7 +16,6 @@ class Dqn():
             print ""
         self.reward_window = []
         self.gamma = gamma
-        self.memory = ReplayMemory(300000)
         self.last_action = 0
         self.last_state = np.zeros(input_size)
         self.num_action = nb_action
@@ -48,8 +29,8 @@ class Dqn():
         slim.summary.tensor_summary("softmax", self.softmax)
         self.chosen_action = tf.argmax(self.softmax, axis=1)
 
-        self.action = tf.placeholder(shape=[100], dtype=tf.int32)
-        self.target = tf.placeholder(shape=[100], dtype=tf.float32)
+        self.action = tf.placeholder(shape=[300], dtype=tf.int32)
+        self.target = tf.placeholder(shape=[300], dtype=tf.float32)
 
         self.hot = slim.one_hot_encoding(self.action, self.num_action, scope="one_hot")
         self.predictions = tf.reduce_sum(self.hot * self.q, axis=1)
@@ -71,16 +52,19 @@ class Dqn():
         self.saver = tf.train.Saver()
         self.sess.run(init)
 
-    def _learn(self, transitions):
-        states = np.array(map(lambda transition: transition.state, transitions))
+    def calculate_transition_reward(self, transition):
+        return sum(map(lambda (r, i): self.gamma ** i * r, zip(map(lambda t: t.reward, reversed(transition[:-1])), range(transition.n - 1))))
+
+    def learn_from_transitions(self, transitions):
+        states = np.array(map(lambda transition: transition[0].state, transitions))
 
         next_stateQs = self.sess.run(self.q, feed_dict={
-            self.input_tensor: np.array(map(lambda transition: transition.next_state, transitions))})
+            self.input_tensor: np.array(map(lambda transition: transition[-1].next_state, transitions))})
 
-        rewards = np.array(map(lambda transition: transition.reward, transitions))
-        actions = np.array(map(lambda transition: transition.action, transitions))
+        rewards = np.array(map(self.calculate_transition_reward, transitions))
+        actions = np.array(map(lambda transition: transition[0].action.index, transitions))
         next_max_qs = next_stateQs.max(1)
-        target = (self.gamma * next_max_qs) + rewards
+        target = ((self.gamma ** len(transitions)) * next_max_qs) + rewards
 
         predictions, loss, training, summary = self.sess.run(
             [self.predictions, self.loss, self.training, self.summary_op],
@@ -90,23 +74,15 @@ class Dqn():
                 self.target: target})
         self.train_writer.add_summary(summary)
 
-    def update(self, reward, new_signal):
-        self.memory.push(
-            Transition(state=self.last_state, action=self.last_action, reward=reward, next_state=new_signal))
-
+    def update(self, new_signal):
         q_orig, softmax, action_value = self.sess.run([self.q, self.softmax, self.chosen_action],
                                                       feed_dict={self.input_tensor: [new_signal]})
         action = action_value[0]
 
-        if len(self.memory.memory) > 300:
-            transitions = self.memory.sample(100)
-            self._learn(transitions)
-
-        self.last_action = action
-        self.last_state = new_signal
-        self.reward_window.append(reward)
-
         return action
+
+    def append_reward(self, reward):
+        self.reward_window.append(reward)
 
     def score(self):
         return sum(self.reward_window) / len(self.reward_window) + 1.

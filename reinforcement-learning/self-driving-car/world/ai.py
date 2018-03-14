@@ -7,8 +7,8 @@ class SelfDrivingCarAI:
     def __init__(self, gamma, dqn_initializator):
         self.brain = dqn_initializator(AiInputProvider.INPUT_DIM, AiActionProvider.NUMBER_OF_ACTIONS, gamma)
 
-    def get_next_action(self, input, last_reward):
-        action = self.brain.update(last_reward, input)
+    def get_next_action(self, input):
+        action = self.brain.update(input)
         return AiActionProvider.ACTIONS[action]
 
     def score(self):
@@ -24,7 +24,8 @@ class AiAction:
 
 
 class RotationAction(AiAction):
-    def __init__(self, deg):
+    def __init__(self, deg, index):
+        self.index = index
         self.deg = deg
 
     def apply(self, car, game_world):
@@ -32,5 +33,6 @@ class RotationAction(AiAction):
 
 
 class AiActionProvider:
-    ACTIONS = [RotationAction(0), RotationAction(-20), RotationAction(-10), RotationAction(10), RotationAction(20)]
+    ACTIONS = [RotationAction(0, 0), RotationAction(-20, 1), RotationAction(-10, 2), RotationAction(10, 3),
+               RotationAction(20, 4)]
     NUMBER_OF_ACTIONS = len(ACTIONS)

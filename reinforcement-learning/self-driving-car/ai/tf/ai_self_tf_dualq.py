@@ -113,16 +113,21 @@ class Dqn:
         self.target = QNet(input_size, nb_action, "target")
         self.steps_since_last_update = 0
 
-    def _learn(self, transitions):
-        states = np.array(map(lambda transition: transition.state, transitions))
+    def calculate_transition_reward(self, transition):
+        return sum(map(lambda (r, i): self.gamma ** i * r,
+                       zip(map(lambda t: t.reward, reversed(transition[:-1])), range(transition.n - 1))))
+
+    def learn_from_transitions(self, transitions):
+
+        states = np.array(map(lambda transition: transition[0].state, transitions))
 
         next_state_qs = self.target.predict_q_values(
-            np.array(map(lambda transition: transition.next_state, transitions)))
+            np.array(map(lambda transition: transition[-1].next_state, transitions)))
 
-        rewards = np.array(map(lambda transition: transition.reward, transitions))
-        actions = np.array(map(lambda transition: transition.action, transitions))
+        rewards = np.array(map(self.calculate_transition_reward, transitions))
+        actions = np.array(map(lambda transition: transition[0].action.index, transitions))
         next_max_qs = next_state_qs.max(1)
-        target = (self.gamma * next_max_qs) + rewards
+        target = ((self.gamma ** len(transitions)) * next_max_qs) + rewards
         self.online.learn(states, actions, target)
         if self.steps_since_last_update >= UPDATE_EVERY_N_STEPS:
             print "Updating target network"
@@ -131,20 +136,14 @@ class Dqn:
         else:
             self.steps_since_last_update += 1
 
-    def update(self, reward, new_signal):
-        self.memory.push(
-            Transition(state=self.last_state, action=self.last_action, reward=reward, next_state=new_signal))
-
-        if len(self.memory.memory) > 500:
-            transitions = self.memory.sample(300)
-            self._learn(transitions)
+    def update(self, new_signal):
 
         action = self.online.select_action(new_signal)
-        self.last_action = action
-        self.last_state = new_signal
-        self.reward_window.append(reward)
 
         return action
+
+    def append_reward(self, reward):
+        self.reward_window.append(reward)
 
     def score(self):
         return sum(self.reward_window) / len(self.reward_window) + 1.

@@ -34,6 +34,7 @@ parser.add_argument('--end_brain', help='Name of brain to write to after the ite
 parser.add_argument('--sand', help='Name of sand file to load from saves/sands')
 parser.add_argument('--iterations', type=int, help='How many iterations to run in simulation mode')
 parser.add_argument('--save_after_steps', type=int, help='How many iterations to run in simulation mode')
+parser.add_argument('--eligibility_n', type=int, help='How many steps should eligiblity trace take (1 is default, is simple one step Q learning)')
 
 args = parser.parse_args()
 
@@ -43,8 +44,6 @@ elif args.impl == TF_DOUBLE:
     from ai.tf.ai_self_tf_dualq import Dqn
 elif args.impl == KERAS:
     from ai.ai_self_keras import Dqn
-elif args.impl == PYTORCH:
-    from ai.ai_self import Dqn
 
 # Adding this line if we don't want the right click to put a red point
 SAVES = "./saves"
@@ -65,6 +64,7 @@ def ensure_dir(path):
 ensure_dir(SAVES)
 ensure_dir(SAVES_BRAINS)
 ensure_dir(SAVES_SANDS)
+n_steps = args.eligibility_n if args.eligibility_n else 1
 
 # Running the whole thing
 game_world = SelfDrivingCarGameWorld(HEIGHT, WIDTH)
@@ -73,7 +73,7 @@ ai_input_provider = AiInputProvider(game_world)
 ai = SelfDrivingCarAI(0.9, Dqn)
 score_history = ScoreHistory()
 save_orchestrator = SaveOrchestrator("saves/", ai.brain, game_world)
-game_updater = GameUpdater(reward_calculator, ai_input_provider, ai, score_history, game_world)
+game_updater = GameUpdater(reward_calculator, ai_input_provider, ai, score_history, game_world, n_steps)
 sand_painter = MyPaintWidget(HEIGHT, WIDTH, game_world)
 
 if args.sand:

@@ -32,6 +32,8 @@ class ReplayMemory:
 
 class Dqn():
     def __init__(self, input_size, nb_action, gamma):
+        raise AssertionError("Keras implementation longer supported doe to eligibility trace")
+
         self.gamma = gamma
         self.reward_window = []
         self.gamma = gamma
