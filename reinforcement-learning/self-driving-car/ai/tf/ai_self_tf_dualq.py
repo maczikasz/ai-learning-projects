@@ -102,7 +102,7 @@ class Dqn:
         try:
             shutil.rmtree("train/")
         except OSError:
-            print ""
+            print("")
         self.reward_window = []
         self.memory = ReplayMemory(300000)
         self.last_action = 0
@@ -114,23 +114,28 @@ class Dqn:
         self.steps_since_last_update = 0
 
     def calculate_transition_reward(self, transition):
-        return sum(map(lambda (r, i): self.gamma ** i * r,
-                       zip(map(lambda t: t.reward, reversed(transition[:-1])), range(transition.n - 1))))
+        def calculate_decay_reward(tup):
+            r, i = tup
+            return self.gamma ** i * r
+
+        return sum(lmap(calculate_decay_reward,
+                       zip(lmap(lambda t: t.reward, reversed(transition[:-1])), range(transition.n - 1))))
 
     def learn_from_transitions(self, transitions):
 
-        states = np.array(map(lambda transition: transition[0].state, transitions))
+        states = np.array(lmap(lambda transition: transition[0].state, transitions))
 
         next_state_qs = self.target.predict_q_values(
-            np.array(map(lambda transition: transition[-1].next_state, transitions)))
+            np.array(lmap(lambda transition: transition[-1].next_state, transitions)))
 
-        rewards = np.array(map(self.calculate_transition_reward, transitions))
-        actions = np.array(map(lambda transition: transition[0].action.index, transitions))
+        rewards = np.array(lmap(self.calculate_transition_reward, transitions))
+        actions = np.array(lmap(lambda transition: transition[0].action.index, transitions))
         next_max_qs = next_state_qs.max(1)
         target = ((self.gamma ** len(transitions)) * next_max_qs) + rewards
         self.online.learn(states, actions, target)
         if self.steps_since_last_update >= UPDATE_EVERY_N_STEPS:
-            print "Updating target network"
+            print
+            "Updating target network"
             self.target.update_with_other_network(self.online)
             self.steps_since_last_update = 0
         else:

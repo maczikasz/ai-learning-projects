@@ -12,7 +12,7 @@ class CarAppSimulator:
         while self.run_condition(step):
             self.after_each_step(step)
             if step % 1000 == 0:
-                print step
+                print(step)
             if step % 10000 == 0:
                 self.score_history.plot_rewards()
 

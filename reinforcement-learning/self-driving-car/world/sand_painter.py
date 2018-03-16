@@ -1,4 +1,5 @@
 import numpy as np
+from future.utils import lmap
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Line
 
@@ -49,4 +50,4 @@ class MyPaintWidget(Widget):
         for line in self.game_world.sand_lines:
             with self.canvas:
                 Color(0.8, 0.7, 0)
-                Line(points=map(lambda a: int(a), line[:-1]), width=line[-1])
+                Line(points=lmap(lambda a: int(a), line[:-1]), width=line[-1])

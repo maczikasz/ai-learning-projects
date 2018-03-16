@@ -4,6 +4,7 @@ import random
 
 import keras
 import numpy as np
+from future.utils import lmap
 from keras import Sequential
 from keras import backend as K
 from keras.layers import Dense
@@ -50,12 +51,12 @@ class Dqn():
         self.model.compile(adam, loss=mean_squared_error)
 
     def _learn(self, transitions):
-        states = np.array(map(lambda transition: transition.state, transitions))
+        states = np.array(lmap(lambda transition: transition.state, transitions))
 
-        next_stateQs = self.model.predict(np.array(map(lambda transition: transition.next_state, transitions)))
+        next_stateQs = self.model.predict(np.array(lmap(lambda transition: transition.next_state, transitions)))
 
-        rewards = np.array(map(lambda transition: transition.reward, transitions))
-        actions = np.array(map(lambda transition: transition.action, transitions))
+        rewards = np.array(lmap(lambda transition: transition.reward, transitions))
+        actions = np.array(lmap(lambda transition: transition.action, transitions))
         next_max_qs = next_stateQs.max(1)
         target = (self.gamma * next_max_qs) + rewards
         one_hot = keras.utils.to_categorical(actions, self.num_action)

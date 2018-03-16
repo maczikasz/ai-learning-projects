@@ -39,7 +39,7 @@ class ReplayMemory:
 
     def sample(self, batch_size):
         samples = zip(*random.sample(self.memory, batch_size))
-        return map(lambda x: Variable(torch.cat(x, 0)), samples)
+        return lmap(lambda x: Variable(torch.cat(x, 0)), samples)
 
 
 class Dqn():

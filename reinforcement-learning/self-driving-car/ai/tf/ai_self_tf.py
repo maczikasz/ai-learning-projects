@@ -4,6 +4,7 @@ import shutil
 import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
+from future.utils import lmap
 
 HIDDEN_LAYER_SIZE = 30
 
@@ -13,7 +14,7 @@ class Dqn():
         try:
             shutil.rmtree("train/")
         except OSError:
-            print ""
+            print("")
         self.reward_window = []
         self.gamma = gamma
         self.last_action = 0
@@ -53,16 +54,20 @@ class Dqn():
         self.sess.run(init)
 
     def calculate_transition_reward(self, transition):
-        return sum(map(lambda (r, i): self.gamma ** i * r, zip(map(lambda t: t.reward, reversed(transition[:-1])), range(transition.n - 1))))
+        def decay_reward(tup):
+            r, i = tup
+            return self.gamma ** i * r
+
+        return sum(lmap(decay_reward, zip(lmap(lambda t: t.reward, reversed(transition[:-1])), range(transition.n - 1))))
 
     def learn_from_transitions(self, transitions):
-        states = np.array(map(lambda transition: transition[0].state, transitions))
+        states = np.array(lmap(lambda transition: transition[0].state, transitions))
 
         next_stateQs = self.sess.run(self.q, feed_dict={
-            self.input_tensor: np.array(map(lambda transition: transition[-1].next_state, transitions))})
+            self.input_tensor: np.array(lmap(lambda transition: transition[-1].next_state, transitions))})
 
-        rewards = np.array(map(self.calculate_transition_reward, transitions))
-        actions = np.array(map(lambda transition: transition[0].action.index, transitions))
+        rewards = np.array(lmap(self.calculate_transition_reward, transitions))
+        actions = np.array(lmap(lambda transition: transition[0].action.index, transitions))
         next_max_qs = next_stateQs.max(1)
         target = ((self.gamma ** len(transitions)) * next_max_qs) + rewards
 

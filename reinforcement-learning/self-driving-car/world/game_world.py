@@ -25,7 +25,7 @@ class SelfDrivingCarGameWorld:
 
         if distance < 100:
             self.goal = Point(self.width - self.goal.x, self.height - self.goal.y)
-            print self.goal
+            print(self.goal)
 
     def get_goal(self):
         return self.goal

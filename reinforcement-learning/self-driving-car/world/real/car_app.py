@@ -6,7 +6,7 @@ from kivy.clock import Clock
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 
-from kivy_setup.kivy_init import LoadDialog, SaveDialog
+from . kivy_setup.kivy_init import LoadDialog, SaveDialog
 
 
 class CarApp(App):

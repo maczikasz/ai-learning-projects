@@ -1,6 +1,6 @@
 from collections import deque
 
-from memory.n_step_replay_memory import NStepReplayMemory, Transition, NStepTransition
+from . memory.n_step_replay_memory import NStepReplayMemory, Transition, NStepTransition
 
 
 class GameUpdater:

@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from ai_input_provider import AiInputProvider
+from . ai_input_provider import AiInputProvider
 
 
 class SelfDrivingCarAI:

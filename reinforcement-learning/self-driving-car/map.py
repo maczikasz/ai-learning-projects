@@ -97,7 +97,7 @@ if args.mode == SIMULATION:
     if args.save_after_steps:
         def after_each_step(step):
             if step % args.save_after_steps == 0 and step != 0:
-                print "Saving brain"
+                print("Saving brain")
                 save_orchestrator.save_brain(os.path.join(SAVES_BRAINS, args.end_brain))
     else:
         def after_each_step(step):
@@ -109,7 +109,7 @@ if args.mode == SIMULATION:
     if args.end_brain:
         save_orchestrator.save_brain(os.path.join(SAVES_BRAINS, args.end_brain))
     score_history.plot_rewards()
-    print "Finished %i iterations brain saved to %s" % (args.iterations, args.end_brain)
+    print("Finished %i iterations brain saved to %s" % (args.iterations, args.end_brain))
 elif args.mode == UI:
     Builder.load_file("world/real/kivy_setup/car.kv")
     game = Game(game_updater)
