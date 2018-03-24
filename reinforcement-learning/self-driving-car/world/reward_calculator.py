@@ -16,11 +16,11 @@ class RewardCalculator():
         if self.game_world.sand[int(x), int(y)] > 0:
             last_reward = -2
         else:  # otherwise
-            # last_reward = -1
+            last_reward = -1
             if distance < self.last_distance:
-                last_reward = 0.3
-            else:
-                last_reward = -0.1
+                last_reward = 0.1
+            # else:
+            #     last_reward = -0.1
 
         if x < 10:
             car.x = 10
@@ -30,7 +30,7 @@ class RewardCalculator():
             last_reward = -1
         if y < 10:
             car.y = 11
-            last_reward = -2
+            last_reward = -1
         if y > self.game_world.height - 10:
             car.y = self.game_world.height - 10
             last_reward = -1

@@ -10,7 +10,8 @@ class AiInputProvider:
     def calculate_ai_input(self, car):
         x = car.x
         y = car.y
-        xx = self.game_world.get_goal().x - x
-        yy = self.game_world.get_goal().y - y
+        goal = self.game_world.get_goal()
+        xx = goal.x - x
+        yy = goal.y - y
         orientation = Vector(*car.velocity).angle((xx, yy)) / 180.
         return [car.signal1, car.signal2, car.signal3, orientation, -orientation]

@@ -11,7 +11,7 @@ class GameUpdater:
         self.ai = ai
         self.ai_input_provider = ai_input_provider
         self.reward_calculator = reward_calculator
-        self.memory = NStepReplayMemory(10000, n_steps)
+        self.memory = NStepReplayMemory(100000, n_steps)
         self.last_transitions = deque()
 
     def update(self, car):
@@ -32,7 +32,7 @@ class GameUpdater:
         if len(self.last_transitions) == self.n_steps:
             n_step_transition = NStepTransition(self.last_transitions)
             self.memory.push(n_step_transition)
-            if len(self.memory.memory) > 900:
-                transition_samples = self.memory.sample(300)
+            if len(self.memory.memory) > 300:
+                transition_samples = self.memory.sample(100)
                 self.ai.brain.learn_from_transitions(transition_samples)
             self.last_transitions = deque()
