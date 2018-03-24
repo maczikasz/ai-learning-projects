@@ -44,6 +44,8 @@ elif args.impl == TF_DOUBLE:
     from ai.tf.ai_self_tf_dualq import Dqn
 elif args.impl == KERAS:
     from ai.ai_self_keras import Dqn
+elif args.impl == PYTORCH:
+    from ai.ai_self_pytorch import Dqn
 
 # Adding this line if we don't want the right click to put a red point
 SAVES = "./saves"

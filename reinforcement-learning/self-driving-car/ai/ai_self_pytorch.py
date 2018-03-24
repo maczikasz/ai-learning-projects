@@ -45,7 +45,6 @@ class ReplayMemory:
 
 class Dqn():
     def __init__(self, input_size, nb_action, gamma):
-        raise AssertionError("Pytorch implementation is longer supported doe to eligibility trace")
         self.gamma = gamma
         self.model = Network(input_size, nb_action)
         self.reward_window = []
@@ -77,20 +76,22 @@ class Dqn():
         td_loss.backward(retain_variables=True)
         self.optimizer.step()
 
-    def update(self, reward, new_signal):
-        new_state = torch.Tensor(new_signal).float().unsqueeze(0)
-        self.memory.push(
-            (self.last_state, new_state, torch.LongTensor([int(self.last_action)]), torch.Tensor([self.last_reward])))
-        action = self.select_action(new_state)
-        if len(self.memory.memory) > 300:
-            batch_state, batch_next_state, batch_action, batch_reward = self.memory.sample(100)
-            self.learn(batch_state, batch_next_state, batch_reward, batch_action)
-        self.last_action = action
-        self.last_state = new_state
-        self.last_reward = reward
+    def learn_from_transitions(self, transitions):
+        batch_state = self.to_variable(lambda t: torch.Tensor(t[0].state).float().unsqueeze(0), transitions)
+        batch_action = self.to_variable(lambda t: torch.LongTensor([int(t[0].action.index)]), transitions)
+        batch_next_state = self.to_variable(lambda t: torch.Tensor(t[0].next_state).float().unsqueeze(0), transitions)
+        batch_reward = self.to_variable(lambda t: torch.Tensor([t[0].reward]), transitions)
+        self.learn(batch_state, batch_next_state, batch_reward, batch_action)
+
+    def to_variable(self, transform, transitions):
+        return Variable(torch.cat(lmap(transform, transitions), 0))
+
+    def append_reward(self, reward):
         self.reward_window.append(reward)
-        if len(self.reward_window) > 1000:
-            del self.reward_window[0]
+
+    def update(self, new_signal):
+        new_state = torch.Tensor(new_signal).float().unsqueeze(0)
+        action = self.select_action(new_state)
         return action
 
     def score(self):
