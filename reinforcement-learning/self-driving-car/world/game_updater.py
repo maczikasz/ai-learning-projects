@@ -1,6 +1,6 @@
 from collections import deque
 
-from . memory.n_step_replay_memory import NStepReplayMemory, Transition, NStepTransition
+from .memory.n_step_replay_memory import NStepReplayMemory, Transition, NStepTransition
 
 
 class GameUpdater:
@@ -11,10 +11,14 @@ class GameUpdater:
         self.ai = ai
         self.ai_input_provider = ai_input_provider
         self.reward_calculator = reward_calculator
-        self.memory = NStepReplayMemory(100000, n_steps)
+        self.memory = NStepReplayMemory(10000, n_steps)
         self.last_transitions = deque()
+        self.step = 0
 
     def update(self, car):
+        self.step += 1
+        if self.step % 1000 == 0:
+            print self.step
         state = self.ai_input_provider.calculate_ai_input(car)
 
         action = self.ai.get_next_action(state)
@@ -32,7 +36,7 @@ class GameUpdater:
         if len(self.last_transitions) == self.n_steps:
             n_step_transition = NStepTransition(self.last_transitions)
             self.memory.push(n_step_transition)
-            if len(self.memory.memory) > 300:
+            if len(self.memory.memory) >= 300:
                 transition_samples = self.memory.sample(100)
                 self.ai.brain.learn_from_transitions(transition_samples)
             self.last_transitions = deque()
